@@ -1,19 +1,34 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 function UserList() {
+
   let [users, setUsers] = useState([])
   let [loader, setLoader] = useState(false)
 
-  let url = "http://localhost:3000/users"
+  let url = "http://localhost:3000/users/";
+
+    let navigate = useNavigate()
 
   async function getUsers() {
-    let response = await fetch(url)
-    let data = await response.json()
 
-    console.log(data)
+    try {
+      let response = await axios.get(url)
+      // console.log(response.data)
+      setUsers(response.data)
+      setLoader(false)
+    } catch (error) {
+      alert(error)
+    }
 
-    setUsers(data)
-    setLoader(false)
+    // let response = await fetch(url)
+    // let data = await response.json()
+
+    // console.log(data)
+
+    // setUsers(data)
+    // setLoader(false)
   }
 
   useEffect(() => {
@@ -22,19 +37,32 @@ function UserList() {
   }, [])
 
   async function deleteUser(id) {
-    console.log("clicked" +'/'+ id)
 
-    let response = await fetch(url +'/'+ id, {
-      method: "DELETE"
-    })
+    try {
+      await axios.delete(url + id)
 
-    if (response.ok) {
-      alert("User Deleted")
+      alert("User Deeted Succesfully")
       getUsers()
-    } else {
-      alert("Something went wrong..")
+    } catch (error) {
+      alert(error)
     }
+
+
+    //   let response = await fetch(url +'/' + id, {
+    //     method: "DELETE"
+    //   })
+
+    //   if (response.ok) {
+    //     alert("User Deleted")
+    //     getUsers()
+    //   } else {
+    //     alert("Something went wrong..")
+    //   }
   }
+
+function editUser(id) {
+  navigate("edit/" + id)
+}
 
   return (
     <>
@@ -63,6 +91,13 @@ function UserList() {
                   className="border bg-red-300"
                 >
                   Delete
+                </button>
+
+                <button
+                  onClick={() => editUser(user.id)}
+                  className="border bg-red-100"
+                >
+                  Update
                 </button>
               </li>
             </ul>
